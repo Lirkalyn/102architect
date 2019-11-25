@@ -9,14 +9,31 @@
 import sys
 import math
 
+def cal_multi_matrix(array1, array2, res_x, res_y):
+	array3 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	array3[0] = (array1[0] * array2[0]) + (array1[1] * array2[3]) + (array1[2] * array2[6])
+	array3[1] = (array1[0] * array2[1]) + (array1[1] * array2[4]) + (array1[2] * array2[7])
+	array3[2] = (array1[0] * array2[2]) + (array1[1] * array2[5]) + (array1[2] * array2[8])
+	array3[3] = (array1[3] * array2[0]) + (array1[4] * array2[3]) + (array1[5] * array2[6])
+	array3[4] = (array1[3] * array2[1]) + (array1[4] * array2[4]) + (array1[5] * array2[7])
+	array3[5] = (array1[3] * array2[2]) + (array1[4] * array2[5]) + (array1[5] * array2[8])
+	array3[6] = (array1[6] * array2[0]) + (array1[7] * array2[3]) + (array1[8] * array2[6])
+	array3[7] = (array1[6] * array2[1]) + (array1[7] * array2[4]) + (array1[8] * array2[7])
+	array3[8] = (array1[6] * array2[2]) + (array1[7] * array2[5]) + (array1[8] * array2[8])
+	array3[9] = res_x
+	array3[10] = res_y
+	return array3
+
 if len(sys.argv) > 4:
+    x = int(sys.argv[1])
+    y = int(sys.argv[2])
     res_x = 0
     res_y = 0
     i = 3
     nbr_arg = 0
     array2 = []
     while i < len(sys.argv):
-        array = [0, 0, 0, 0, 0, 0, 0, 0, 1]
+        array = [0, 0, 0, 0, 0, 0, 0, 0, 1, x, y]
         if (sys.argv[i] == "-t"):
             tmp = int(sys.argv[i + 1])
             tmp2 = int(sys.argv[i + 2])
@@ -25,8 +42,8 @@ if len(sys.argv) > 4:
             array[2] = tmp
             array[4] = 1
             array[5] = tmp2
-            res_x = int(sys.argv[i - 2]) + tmp
-            res_y = int(sys.argv[i - 1]) + tmp2
+            x = res_x = array[9] + tmp
+            y = res_y = array[10] + tmp2
             i += 2
             nbr_arg += 1
         elif (sys.argv[i] == "-z"):
@@ -35,8 +52,8 @@ if len(sys.argv) > 4:
             print ("Scaling by factors %d and %d" % (tmp , tmp2))
             array[0] = tmp
             array[4] = tmp2
-            res_x = int(sys.argv[i - 2]) * tmp
-            res_y = int(sys.argv[i - 1]) * tmp2
+            x = res_x = array[9] * tmp
+            y = res_y = array[10] * tmp2
             i += 2
             nbr_arg += 1
         elif (sys.argv[i] == "-r"):
@@ -46,13 +63,28 @@ if len(sys.argv) > 4:
             array[1] = round(-math.sin(math.radians(tmp)), 8)
             array[3] = round(math.sin(math.radians(tmp)), 8)
             array[4] = round(math.cos(math.radians(tmp)), 8)
-            res_x = ((array[0] * int(sys.argv[i - 2])) + (array[1] * int(sys.argv[i - 1])))
-            res_y = ((array[3] * int(sys.argv[i - 2])) + (array[4] * int(sys.argv[i - 1])))
-            i += 2
+            x = res_x = ((array[0] * array[9]) + (array[1] * array[10]))
+            y = res_y = ((array[3] * array[9]) + (array[4] * array[10]))
+            i += 1
             nbr_arg += 1
+        elif (sys.argv[i] == "-s"):
+            tmp = int(sys.argv[i + 1])
+            print ("Reflection over an axis with an inclination angle of %d degrees" % (tmp))
+            array[0] = round(math.cos(2 * math.radians(tmp)), 8)
+            array[1] = round(math.sin(2 * math.radians(tmp)), 8)
+            array[3] = round(math.sin(2 * math.radians(tmp)), 8)
+            array[4] = round(-math.cos(2 * math.radians(tmp)), 8)
+            x = res_x = ((array[0] * array[9]) + (array[1] * array[10]))
+            y = res_y = ((array[3] * array[9]) + (array[4] * array[10]))
+            i += 1
+            nbr_arg += 1
+        else:
+            sys.exit(84)
         if (nbr_arg == 1):
             for a in array:
                 array2.append(a)
+        elif (nbr_arg >= 2):
+            array2 = cal_multi_matrix(array, array2, res_x, res_y)
         i += 1
     print ("%.2f %.2f %.2f" % (array2[0], array2[1], array2[2]))
     print ("%.2f %.2f %.2f" % (array2[3], array2[4], array2[5]))
